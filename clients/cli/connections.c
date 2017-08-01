@@ -134,6 +134,7 @@ const NmcMetaGenericInfo *const nmc_fields_con_active_details_general[] = {
                                          NM_SETTING_BRIDGE_PORT_SETTING_NAME","\
                                          NM_SETTING_TEAM_SETTING_NAME","\
                                          NM_SETTING_TEAM_PORT_SETTING_NAME"," \
+                                         NM_SETTING_OVS_INTERFACE_SETTING_NAME","\
                                          NM_SETTING_DCB_SETTING_NAME"," \
                                          NM_SETTING_TUN_SETTING_NAME"," \
                                          NM_SETTING_IP_TUNNEL_SETTING_NAME"," \
