@@ -77,6 +77,7 @@
 #include "nm-setting-macvlan.h"
 #include "nm-setting-olpc-mesh.h"
 #include "nm-setting-ovs-interface.h"
+#include "nm-setting-ovs-port.h"
 #include "nm-setting-ppp.h"
 #include "nm-setting-pppoe.h"
 #include "nm-setting-proxy.h"

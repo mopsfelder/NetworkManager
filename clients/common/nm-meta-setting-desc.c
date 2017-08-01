@@ -5008,6 +5008,7 @@ static const NMMetaPropertyInfo *const property_infos_CONNECTION[] = {
 		.property_typ_data = DEFINE_PROPERTY_TYP_DATA (
 			.values_static =            VALUES_STATIC (NM_SETTING_BOND_SETTING_NAME,
 			                                           NM_SETTING_BRIDGE_SETTING_NAME,
+			                                           NM_SETTING_OVS_PORT_SETTING_NAME,
 			                                           NM_SETTING_TEAM_SETTING_NAME),
 		),
 	),
@@ -5810,6 +5811,39 @@ static const NMMetaPropertyInfo *const property_infos_OVS_INTERFACE[] = {
 		.property_typ_data = DEFINE_PROPERTY_TYP_DATA (
 			.values_static =        VALUES_STATIC ("internal"),
 		),
+	),
+	NULL
+};
+
+#undef  _CURRENT_NM_META_SETTING_TYPE
+#define _CURRENT_NM_META_SETTING_TYPE NM_META_SETTING_TYPE_OVS_PORT
+static const NMMetaPropertyInfo *const property_infos_OVS_PORT[] = {
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_OVS_PORT_VLAN_MODE,
+		.property_type =                &_pt_gobject_string,
+		.property_typ_data = DEFINE_PROPERTY_TYP_DATA (
+			.values_static =        VALUES_STATIC ("access", "native-tagged", "native-untagged", "trunk"),
+		),
+	),
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_OVS_PORT_TAG,
+		.property_type =                &_pt_gobject_int,
+	),
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_OVS_PORT_LACP,
+		.property_type =                &_pt_gobject_string,
+		.property_typ_data = DEFINE_PROPERTY_TYP_DATA (
+			.values_static =        VALUES_STATIC ("active", "off", "passive"),
+		),
+	),
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_OVS_PORT_BOND_MODE,
+		.property_type =                &_pt_gobject_string,
+		.property_typ_data = DEFINE_PROPERTY_TYP_DATA (
+			.values_static =        VALUES_STATIC ("active-backup", "balance-slb", "balance-tcp"),
+		),
+	),
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_OVS_PORT_BOND_UPDELAY,
+		.property_type =                &_pt_gobject_int,
+	),
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_OVS_PORT_BOND_DOWNDELAY,
+		.property_type =                &_pt_gobject_int,
 	),
 	NULL
 };
@@ -6734,6 +6768,7 @@ _setting_init_fcn_wireless (ARGS_SETTING_INIT_FCN)
 #define SETTING_PRETTY_NAME_MACVLAN             N_("macvlan connection")
 #define SETTING_PRETTY_NAME_OLPC_MESH           N_("OLPC Mesh connection")
 #define SETTING_PRETTY_NAME_OVS_INTERFACE       N_("OpenVSwitch interface settings")
+#define SETTING_PRETTY_NAME_OVS_PORT            N_("OpenVSwitch port settings")
 #define SETTING_PRETTY_NAME_PPP                 N_("PPP settings")
 #define SETTING_PRETTY_NAME_PPPOE               N_("PPPoE")
 #define SETTING_PRETTY_NAME_PROXY               N_("Proxy")
@@ -6892,6 +6927,12 @@ const NMMetaSettingInfoEditor nm_meta_setting_infos_editor[] = {
 			NM_META_SETTING_VALID_PART_ITEM (WIRED,                 FALSE),
 		),
 	),
+	SETTING_INFO (OVS_PORT,
+		.valid_parts = NM_META_SETTING_VALID_PARTS (
+			NM_META_SETTING_VALID_PART_ITEM (CONNECTION,            TRUE),
+			NM_META_SETTING_VALID_PART_ITEM (OVS_PORT,              TRUE),
+		),
+	),
 	SETTING_INFO (PPPOE,
 		/* PPPoE is a base connection type from historical reasons.
 		 * See libnm-core/nm-setting.c:_nm_setting_is_base_type()
@@ -6998,6 +7039,16 @@ static const NMMetaSettingValidPartItem *const valid_settings_slave_bridge[] = {
 	NULL,
 };
 
+static const NMMetaSettingValidPartItem *const valid_settings_slave_ovs_bridge[] = {
+	NM_META_SETTING_VALID_PART_ITEM (OVS_PORT, FALSE),
+	NULL,
+};
+
+static const NMMetaSettingValidPartItem *const valid_settings_slave_ovs_port[] = {
+	NM_META_SETTING_VALID_PART_ITEM (OVS_INTERFACE, FALSE),
+	NULL,
+};
+
 static const NMMetaSettingValidPartItem *const valid_settings_slave_team[] = {
 	NM_META_SETTING_VALID_PART_ITEM (TEAM_PORT, TRUE),
 	NULL,
@@ -7017,6 +7068,10 @@ nm_meta_setting_info_valid_parts_for_slave_type (const char *slave_type, const c
 	if (nm_streq (slave_type, NM_SETTING_BRIDGE_SETTING_NAME)) {
 		NM_SET_OUT (out_slave_name, "bridge-slave");
 		return valid_settings_slave_bridge;
+	}
+	if (nm_streq (slave_type, NM_SETTING_OVS_PORT_SETTING_NAME)) {
+		NM_SET_OUT (out_slave_name, "ovs-slave");
+		return valid_settings_slave_ovs_port;
 	}
 	if (nm_streq (slave_type, NM_SETTING_TEAM_SETTING_NAME)) {
 		NM_SET_OUT (out_slave_name, "team-slave");

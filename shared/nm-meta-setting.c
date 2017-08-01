@@ -44,6 +44,7 @@
 #include "nm-setting-macvlan.h"
 #include "nm-setting-olpc-mesh.h"
 #include "nm-setting-ovs-interface.h"
+#include "nm-setting-ovs-port.h"
 #include "nm-setting-ppp.h"
 #include "nm-setting-pppoe.h"
 #include "nm-setting-proxy.h"
@@ -240,6 +241,11 @@ const NMMetaSettingInfo nm_meta_setting_infos[] = {
 		.meta_type =                NM_META_SETTING_TYPE_OVS_INTERFACE,
 		.setting_name =             NM_SETTING_OVS_INTERFACE_SETTING_NAME,
 		.get_setting_gtype =        nm_setting_ovs_interface_get_type,
+	},
+	[NM_META_SETTING_TYPE_OVS_PORT] = {
+		.meta_type =                NM_META_SETTING_TYPE_OVS_PORT,
+		.setting_name =             NM_SETTING_OVS_PORT_SETTING_NAME,
+		.get_setting_gtype =        nm_setting_ovs_port_get_type,
 	},
 	[NM_META_SETTING_TYPE_PPPOE] = {
 		.meta_type =                NM_META_SETTING_TYPE_PPPOE,
