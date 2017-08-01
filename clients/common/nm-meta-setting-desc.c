@@ -5008,6 +5008,7 @@ static const NMMetaPropertyInfo *const property_infos_CONNECTION[] = {
 		.property_typ_data = DEFINE_PROPERTY_TYP_DATA (
 			.values_static =            VALUES_STATIC (NM_SETTING_BOND_SETTING_NAME,
 			                                           NM_SETTING_BRIDGE_SETTING_NAME,
+			                                           NM_SETTING_OVS_BRIDGE_SETTING_NAME,
 			                                           NM_SETTING_OVS_PORT_SETTING_NAME,
 			                                           NM_SETTING_TEAM_SETTING_NAME),
 		),
@@ -5799,6 +5800,27 @@ static const NMMetaPropertyInfo *const property_infos_PPPOE[] = {
 	),
 	PROPERTY_INFO_WITH_DESC (NM_SETTING_PPPOE_PASSWORD_FLAGS,
 		.property_type =                &_pt_gobject_secret_flags,
+	),
+	NULL
+};
+
+#undef  _CURRENT_NM_META_SETTING_TYPE
+#define _CURRENT_NM_META_SETTING_TYPE NM_META_SETTING_TYPE_OVS_BRIDGE
+static const NMMetaPropertyInfo *const property_infos_OVS_BRIDGE[] = {
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_OVS_BRIDGE_FAIL_MODE,
+		.property_type =                &_pt_gobject_string,
+		.property_typ_data = DEFINE_PROPERTY_TYP_DATA (
+			.values_static =        VALUES_STATIC ("secure", "standalone"),
+		),
+	),
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_OVS_BRIDGE_MCAST_SNOOPING_ENABLE,
+		.property_type =                &_pt_gobject_bool,
+	),
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_OVS_BRIDGE_RSTP_ENABLE,
+		.property_type =                &_pt_gobject_bool,
+	),
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_OVS_BRIDGE_STP_ENABLE,
+		.property_type =                &_pt_gobject_bool,
 	),
 	NULL
 };
@@ -6767,6 +6789,7 @@ _setting_init_fcn_wireless (ARGS_SETTING_INIT_FCN)
 #define SETTING_PRETTY_NAME_MACSEC              N_("MACsec connection")
 #define SETTING_PRETTY_NAME_MACVLAN             N_("macvlan connection")
 #define SETTING_PRETTY_NAME_OLPC_MESH           N_("OLPC Mesh connection")
+#define SETTING_PRETTY_NAME_OVS_BRIDGE          N_("OpenVSwitch bridge settings")
 #define SETTING_PRETTY_NAME_OVS_INTERFACE       N_("OpenVSwitch interface settings")
 #define SETTING_PRETTY_NAME_OVS_PORT            N_("OpenVSwitch port settings")
 #define SETTING_PRETTY_NAME_PPP                 N_("PPP settings")
@@ -6917,6 +6940,12 @@ const NMMetaSettingInfoEditor nm_meta_setting_infos_editor[] = {
 			NM_META_SETTING_VALID_PART_ITEM (OLPC_MESH,             TRUE),
 		),
 		.setting_init_fcn =             _setting_init_fcn_olpc_mesh,
+	),
+	SETTING_INFO (OVS_BRIDGE,
+		.valid_parts = NM_META_SETTING_VALID_PARTS (
+			NM_META_SETTING_VALID_PART_ITEM (CONNECTION,            TRUE),
+			NM_META_SETTING_VALID_PART_ITEM (OVS_BRIDGE,            TRUE),
+		),
 	),
 	SETTING_INFO (OVS_INTERFACE,
 		.valid_parts = NM_META_SETTING_VALID_PARTS (
