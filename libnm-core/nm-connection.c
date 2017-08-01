@@ -1087,6 +1087,36 @@ _normalize_bluetooth_type (NMConnection *self, GHashTable *parameters)
 }
 
 static gboolean
+_normalize_ovs_interface_type (NMConnection *self, GHashTable *parameters)
+{
+	NMSettingOvsInterface *s_ovs_interface = nm_connection_get_setting_ovs_interface (self);
+	NMSettingConnection *s_con = nm_connection_get_setting_connection (self);
+	const char *interface_type;
+
+	if (strcmp (nm_connection_get_connection_type (self), NM_SETTING_OVS_INTERFACE_SETTING_NAME) == 0) {
+		/* Internal interface. */
+		interface_type = "internal";
+	} else if (g_strcmp0 (nm_setting_connection_get_slave_type (s_con), NM_SETTING_OVS_PORT_SETTING_NAME) == 0) {
+		/* A regular device enslaved to a port. */
+		interface_type = "";
+	} else {
+		/* Something else. */
+		return FALSE;
+	}
+
+	if (!s_ovs_interface) {
+		s_ovs_interface = NM_SETTING_OVS_INTERFACE (nm_setting_ovs_interface_new ());
+		nm_connection_add_setting (self, NM_SETTING (s_ovs_interface));
+	}
+
+	g_object_set (s_ovs_interface,
+	              NM_SETTING_OVS_INTERFACE_TYPE, interface_type,
+	              NULL);
+
+	return TRUE;
+}
+
+static gboolean
 _normalize_required_settings (NMConnection *self, GHashTable *parameters)
 {
 	NMSettingBluetooth *s_bt = nm_connection_get_setting_bluetooth (self);
@@ -1388,6 +1418,7 @@ nm_connection_normalize (NMConnection *connection,
 	was_modified |= _normalize_team_config (connection, parameters);
 	was_modified |= _normalize_team_port_config (connection, parameters);
 	was_modified |= _normalize_bluetooth_type (connection, parameters);
+	was_modified |= _normalize_ovs_interface_type (connection, parameters);
 
 	/* Verify anew. */
 	success = _nm_connection_verify (connection, error);
@@ -1974,6 +2005,7 @@ nm_connection_is_virtual (NMConnection *connection)
 	    || !strcmp (type, NM_SETTING_IP_TUNNEL_SETTING_NAME)
 	    || !strcmp (type, NM_SETTING_MACSEC_SETTING_NAME)
 	    || !strcmp (type, NM_SETTING_MACVLAN_SETTING_NAME)
+	    || !strcmp (type, NM_SETTING_OVS_INTERFACE_SETTING_NAME)
 	    || !strcmp (type, NM_SETTING_VXLAN_SETTING_NAME))
 		return TRUE;
 
@@ -2324,6 +2356,22 @@ NMSettingOlpcMesh *
 nm_connection_get_setting_olpc_mesh (NMConnection *connection)
 {
 	return _connection_get_setting_check (connection, NM_TYPE_SETTING_OLPC_MESH);
+}
+
+/**
+ * nm_connection_get_setting_ovs_interface:
+ * @connection: the #NMConnection
+ *
+ * A shortcut to return any #NMSettingOvsInterface the connection might contain.
+ *
+ * Returns: (transfer none): an #NMSettingOvsInterface if the connection contains one, otherwise %NULL
+ *
+ * Since: 1.10
+ **/
+NMSettingOvsInterface *
+nm_connection_get_setting_ovs_interface (NMConnection *connection)
+{
+	return _connection_get_setting_check (connection, NM_TYPE_SETTING_OVS_INTERFACE);
 }
 
 /**
