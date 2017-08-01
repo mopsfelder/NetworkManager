@@ -7098,6 +7098,10 @@ nm_meta_setting_info_valid_parts_for_slave_type (const char *slave_type, const c
 		NM_SET_OUT (out_slave_name, "bridge-slave");
 		return valid_settings_slave_bridge;
 	}
+	if (nm_streq (slave_type, NM_SETTING_OVS_BRIDGE_SETTING_NAME)) {
+		NM_SET_OUT (out_slave_name, "ovs-slave");
+		return valid_settings_slave_ovs_bridge;
+	}
 	if (nm_streq (slave_type, NM_SETTING_OVS_PORT_SETTING_NAME)) {
 		NM_SET_OUT (out_slave_name, "ovs-slave");
 		return valid_settings_slave_ovs_port;
