@@ -2528,11 +2528,21 @@ static void
 device_recheck_slave_status (NMDevice *self, const NMPlatformLink *plink)
 {
 	NMDevicePrivate *priv = NM_DEVICE_GET_PRIVATE (self);
+	NMDevice *master;
+	const char *master_ifname;
 
 	g_return_if_fail (plink);
 
 	if (plink->master <= 0)
 		return;
+
+	master = nm_manager_get_device_by_ifindex (nm_manager_get (), plink->master);
+	master_ifname = nm_platform_link_get_name (nm_device_get_platform (self), plink->master);
+
+	if (master == NULL && g_strcmp0 (master_ifname, "ovs-system") == 0) {
+		_LOGD (LOGD_DEVICE, "the device claimed by openvswitch");
+		return;
+	}
 
 	if (priv->master) {
 		if (   plink->master > 0
@@ -2545,20 +2555,15 @@ device_recheck_slave_status (NMDevice *self, const NMPlatformLink *plink)
 
 		nm_device_master_release_one_slave (priv->master, self, FALSE, NM_DEVICE_STATE_REASON_CONNECTION_ASSUMED);
 	}
-	if (plink->master > 0) {
-		NMDevice *master;
 
-		master = nm_manager_get_device_by_ifindex (nm_manager_get (), plink->master);
-		if (master && NM_DEVICE_GET_CLASS (master)->enslave_slave)
-			nm_device_master_add_slave (master, self, FALSE);
-		else if (master) {
-			_LOGI (LOGD_DEVICE, "enslaved to non-master-type device %s; ignoring",
-			       nm_device_get_iface (master));
-		} else {
-			_LOGW (LOGD_DEVICE, "enslaved to unknown device %d %s",
-			       plink->master,
-			       nm_platform_link_get_name (nm_device_get_platform (self), plink->master));
-		}
+	if (master && NM_DEVICE_GET_CLASS (master)->enslave_slave)
+		nm_device_master_add_slave (master, self, FALSE);
+	else if (master) {
+		_LOGI (LOGD_DEVICE, "enslaved to non-master-type device %s; ignoring",
+		       nm_device_get_iface (master));
+	} else {
+		_LOGW (LOGD_DEVICE, "enslaved to unknown device %d %s",
+		       plink->master, master_ifname);
 	}
 }
 
