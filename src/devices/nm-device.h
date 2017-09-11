@@ -293,6 +293,8 @@ typedef struct {
 	 */
 	gboolean    (* check_connection_compatible) (NMDevice *self, NMConnection *connection);
 
+	gboolean    (* check_slave_connection_compatible) (NMDevice *self, NMConnection *slave);
+
 	/* Checks whether the connection is likely available to be activated,
 	 * including any live network information like scan lists.  The connection
 	 * is checked against the object defined by @specific_object, if given.
