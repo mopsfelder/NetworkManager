@@ -1651,6 +1651,8 @@ _get_route_metric_default (NMDevice *self)
 		return 700;
 	case NM_DEVICE_TYPE_BT:
 		return 750;
+	case NM_DEVICE_TYPE_OVS_INTERFACE:
+		return 800;
 	case NM_DEVICE_TYPE_GENERIC:
 		return 950;
 	case NM_DEVICE_TYPE_UNKNOWN:
