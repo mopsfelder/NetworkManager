@@ -2006,6 +2006,7 @@ nm_connection_is_virtual (NMConnection *connection)
 	    || !strcmp (type, NM_SETTING_MACSEC_SETTING_NAME)
 	    || !strcmp (type, NM_SETTING_MACVLAN_SETTING_NAME)
 	    || !strcmp (type, NM_SETTING_OVS_INTERFACE_SETTING_NAME)
+	    || !strcmp (type, NM_SETTING_OVS_PORT_SETTING_NAME)
 	    || !strcmp (type, NM_SETTING_VXLAN_SETTING_NAME))
 		return TRUE;
 
@@ -2372,6 +2373,22 @@ NMSettingOvsInterface *
 nm_connection_get_setting_ovs_interface (NMConnection *connection)
 {
 	return _connection_get_setting_check (connection, NM_TYPE_SETTING_OVS_INTERFACE);
+}
+
+/**
+ * nm_connection_get_setting_ovs_port:
+ * @connection: the #NMConnection
+ *
+ * A shortcut to return any #NMSettingOvsPort the connection might contain.
+ *
+ * Returns: (transfer none): an #NMSettingOvsPort if the connection contains one, otherwise %NULL
+ *
+ * Since: 1.10
+ **/
+NMSettingOvsPort *
+nm_connection_get_setting_ovs_port (NMConnection *connection)
+{
+	return _connection_get_setting_check (connection, NM_TYPE_SETTING_OVS_PORT);
 }
 
 /**

@@ -51,6 +51,7 @@ typedef struct _NMSettingMacsec           NMSettingMacsec;
 typedef struct _NMSettingMacvlan          NMSettingMacvlan;
 typedef struct _NMSettingOlpcMesh         NMSettingOlpcMesh;
 typedef struct _NMSettingOvsInterface     NMSettingOvsInterface;
+typedef struct _NMSettingOvsPort          NMSettingOvsPort;
 typedef struct _NMSettingPpp              NMSettingPpp;
 typedef struct _NMSettingPppoe            NMSettingPppoe;
 typedef struct _NMSettingSerial           NMSettingSerial;

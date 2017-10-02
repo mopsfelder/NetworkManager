@@ -215,6 +215,8 @@ NMSettingMacvlan *         nm_connection_get_setting_macvlan           (NMConnec
 NMSettingOlpcMesh *        nm_connection_get_setting_olpc_mesh         (NMConnection *connection);
 NM_AVAILABLE_IN_1_10
 NMSettingOvsInterface *    nm_connection_get_setting_ovs_interface     (NMConnection *connection);
+NM_AVAILABLE_IN_1_10
+NMSettingOvsPort *         nm_connection_get_setting_ovs_port          (NMConnection *connection);
 NMSettingPpp *             nm_connection_get_setting_ppp               (NMConnection *connection);
 NMSettingPppoe *           nm_connection_get_setting_pppoe             (NMConnection *connection);
 NM_AVAILABLE_IN_1_6
