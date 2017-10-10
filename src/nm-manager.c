@@ -1270,8 +1270,8 @@ nm_manager_iface_for_uuid (NMManager *self, const char *uuid)
 	return nm_connection_get_interface_name (NM_CONNECTION (connection));
 }
 
-gboolean
-nm_manager_remove_device (NMManager *self, const char *ifname)
+NMDevice *
+nm_manager_get_device (NMManager *self, const char *ifname, NMDeviceType device_type)
 {
 	NMManagerPrivate *priv = NM_MANAGER_GET_PRIVATE (self);
 	GSList *iter;
@@ -1279,13 +1279,26 @@ nm_manager_remove_device (NMManager *self, const char *ifname)
 
 	for (iter = priv->devices; iter; iter = iter->next) {
 		d = iter->data;
-		if (nm_streq0 (nm_device_get_iface (d), ifname)) {
-			remove_device (self, d, FALSE, FALSE);
-			return TRUE;
-		}
+
+		if (   nm_device_get_device_type (d) == device_type
+		    && nm_streq0 (nm_device_get_iface (d), ifname))
+			return d;
 	}
 
-	return FALSE;
+	return NULL;
+}
+
+gboolean
+nm_manager_remove_device (NMManager *self, const char *ifname, NMDeviceType device_type)
+{
+	NMDevice *d;
+
+	d = nm_manager_get_device (self, ifname, device_type);
+	if (!d)
+		return FALSE;
+
+	remove_device (self, d, FALSE, FALSE);
+	return TRUE;
 }
 
 /**
