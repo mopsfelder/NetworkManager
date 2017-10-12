@@ -44,11 +44,39 @@ NM_SETTING_REGISTER_TYPE (NM_TYPE_SETTING_TEAM)
 
 typedef struct {
 	char *config;
+	gint notifypeers_count;
+	gint notifypeers_interval;
+	gint mcastrejoin_count;
+	gint mcastrejoin_interval;
+	char *runner;
+	char *runner_hwpolicy;
+	GHashTable *runner_txhash;
+	char *runner_txbalancer;
+	gint runner_txbalancer_interval;
+	gboolean runner_active;
+	gboolean runner_fastrate;
+	gint runner_sysprio;
+	gint runner_minports;
+	char *runner_aggselectpolicy;
 } NMSettingTeamPrivate;
 
 enum {
 	PROP_0,
 	PROP_CONFIG,
+	PROP_NOTIFYPEERS_COUNT,
+	PROP_NOTIFYPEERS_INTERVAL,
+	PROP_MCASTREJOIN_COUNT,
+	PROP_MCASTREJOIN_INTERVAL,
+	PROP_RUNNER,
+	PROP_RUNNER_HWPOLICY,
+	PROP_RUNNER_TXHASH,
+	PROP_RUNNER_TXBALANCER,
+	PROP_RUNNER_TXBALANCER_INTERVAL,
+	PROP_RUNNER_ACTIVE,
+	PROP_RUNNER_FASTRATE,
+	PROP_RUNNER_SYSPRIO,
+	PROP_RUNNER_MINPORTS,
+	PROP_RUNNER_AGGSELECTPOLICY,
 	LAST_PROP
 };
 
@@ -79,6 +107,188 @@ nm_setting_team_get_config (NMSettingTeam *setting)
 	return NM_SETTING_TEAM_GET_PRIVATE (setting)->config;
 }
 
+/**
+ * nm_setting_team_get_notifypeers_count:
+ * @setting: the #NMSettingTeam
+ *
+ * Returns: the ##NMSettingTeam:notifypeers_count property of the setting
+ **/
+gint
+nm_setting_team_get_notifypeers_count (NMSettingTeam *setting)
+{
+	g_return_val_if_fail (NM_IS_SETTING_TEAM (setting), 0);
+
+	return NM_SETTING_TEAM_GET_PRIVATE (setting)->notifypeers_count;
+}
+
+/**
+ * nm_setting_team_get_notifypeers_interval:
+ * @setting: the #NMSettingTeam
+ *
+ * Returns: the ##NMSettingTeam:notifypeers_interval property of the setting
+ **/
+gint
+nm_setting_team_get_notifypeers_interval (NMSettingTeam *setting)
+{
+	g_return_val_if_fail (NM_IS_SETTING_TEAM (setting), 0);
+
+	return NM_SETTING_TEAM_GET_PRIVATE (setting)->notifypeers_interval;
+}
+
+/**
+ * nm_setting_team_get_mcastrejoin_count:
+ * @setting: the #NMSettingTeam
+ *
+ * Returns: the ##NMSettingTeam:mcastrejoin_count property of the setting
+ **/
+gint
+nm_setting_team_get_mcastrejoin_count (NMSettingTeam *setting)
+{
+	g_return_val_if_fail (NM_IS_SETTING_TEAM (setting), 0);
+
+	return NM_SETTING_TEAM_GET_PRIVATE (setting)->mcastrejoin_count;
+}
+
+/**
+ * nm_setting_team_get_mcastrejoin_interval:
+ * @setting: the #NMSettingTeam
+ *
+ * Returns: the ##NMSettingTeam:mcastrejoin_interval property of the setting
+ **/
+gint
+nm_setting_team_get_mcastrejoin_interval (NMSettingTeam *setting)
+{
+	g_return_val_if_fail (NM_IS_SETTING_TEAM (setting), 0);
+
+	return NM_SETTING_TEAM_GET_PRIVATE (setting)->mcastrejoin_interval;
+}
+
+/**
+ * nm_setting_team_get_runner:
+ * @setting: the #NMSettingTeam
+ *
+ * Returns: the ##NMSettingTeam:runner property of the setting
+ **/
+const char *
+nm_setting_team_get_runner (NMSettingTeam *setting)
+{
+	g_return_val_if_fail (NM_IS_SETTING_TEAM (setting), NULL);
+
+	return NM_SETTING_TEAM_GET_PRIVATE (setting)->runner;
+}
+
+/**
+ * nm_setting_team_get_runner_hwpolicy:
+ * @setting: the #NMSettingTeam
+ *
+ * Returns: the ##NMSettingTeam:runner_hwpolicy property of the setting
+ **/
+const char *
+nm_setting_team_get_runner_hwpolicy (NMSettingTeam *setting)
+{
+	g_return_val_if_fail (NM_IS_SETTING_TEAM (setting), NULL);
+
+	return NM_SETTING_TEAM_GET_PRIVATE (setting)->runner_hwpolicy;
+}
+
+/**
+ * nm_setting_team_get_runner_txbalancer:
+ * @setting: the #NMSettingTeam
+ *
+ * Returns: the ##NMSettingTeam:runner_txbalancer property of the setting
+ **/
+const char *
+nm_setting_team_get_runner_txbalancer (NMSettingTeam *setting)
+{
+	g_return_val_if_fail (NM_IS_SETTING_TEAM (setting), NULL);
+
+	return NM_SETTING_TEAM_GET_PRIVATE (setting)->runner_txbalancer;
+}
+
+/**
+ * nm_setting_team_get_runner_txbalancer_interval:
+ * @setting: the #NMSettingTeam
+ *
+ * Returns: the ##NMSettingTeam:runner_txbalancer_interval property of the setting
+ **/
+gint
+nm_setting_team_get_runner_txbalancer_interval (NMSettingTeam *setting)
+{
+	g_return_val_if_fail (NM_IS_SETTING_TEAM (setting), 0);
+
+	return NM_SETTING_TEAM_GET_PRIVATE (setting)->runner_txbalancer_interval;
+}
+
+/**
+ * nm_setting_team_get_runner_active:
+ * @setting: the #NMSettingTeam
+ *
+ * Returns: the ##NMSettingTeam:runner_active property of the setting
+ **/
+gboolean
+nm_setting_team_get_runner_active (NMSettingTeam *setting)
+{
+	g_return_val_if_fail (NM_IS_SETTING_TEAM (setting), FALSE);
+
+	return NM_SETTING_TEAM_GET_PRIVATE (setting)->runner_active;
+}
+
+/**
+ * nm_setting_team_get_runner_fastrate:
+ * @setting: the #NMSettingTeam
+ *
+ * Returns: the ##NMSettingTeam:runner_fastrate property of the setting
+ **/
+gboolean
+nm_setting_team_get_runner_fastrate (NMSettingTeam *setting)
+{
+	g_return_val_if_fail (NM_IS_SETTING_TEAM (setting), FALSE);
+
+	return NM_SETTING_TEAM_GET_PRIVATE (setting)->runner_fastrate;
+}
+
+/**
+ * nm_setting_team_get_runner_sysprio:
+ * @setting: the #NMSettingTeam
+ *
+ * Returns: the ##NMSettingTeam:runner_sysprio property of the setting
+ **/
+gint
+nm_setting_team_get_runner_sysprio (NMSettingTeam *setting)
+{
+	g_return_val_if_fail (NM_IS_SETTING_TEAM (setting), 0);
+
+	return NM_SETTING_TEAM_GET_PRIVATE (setting)->runner_sysprio;
+}
+
+/**
+ * nm_setting_team_get_runner_minports:
+ * @setting: the #NMSettingTeam
+ *
+ * Returns: the ##NMSettingTeam:runner_minports property of the setting
+ **/
+gint
+nm_setting_team_get_runner_minports (NMSettingTeam *setting)
+{
+	g_return_val_if_fail (NM_IS_SETTING_TEAM (setting), 0);
+
+	return NM_SETTING_TEAM_GET_PRIVATE (setting)->runner_minports;
+}
+
+/**
+ * nm_setting_team_get_runner_aggselectpolicy:
+ * @setting: the #NMSettingTeam
+ *
+ * Returns: the ##NMSettingTeam:runner_aggselectpolicy property of the setting
+ **/
+const char *
+nm_setting_team_get_runner_aggselectpolicy (NMSettingTeam *setting)
+{
+	g_return_val_if_fail (NM_IS_SETTING_TEAM (setting), NULL);
+
+	return NM_SETTING_TEAM_GET_PRIVATE (setting)->runner_aggselectpolicy;
+}
+
 static gboolean
 verify (NMSetting *setting, NMConnection *connection, GError **error)
 {
@@ -106,6 +316,19 @@ verify (NMSetting *setting, NMConnection *connection, GError **error)
 			/* We treat an empty string as no config for compatibility. */
 			return *priv->config ? FALSE : NM_SETTING_VERIFY_NORMALIZABLE;
 		}
+	}
+
+	if (   priv->runner
+	    && g_ascii_strcasecmp (priv->runner, NM_SETTING_TEAM_RUNNER_BROADCAST)
+	    && g_ascii_strcasecmp (priv->runner, NM_SETTING_TEAM_RUNNER_ROUNDROBIN)
+	    && g_ascii_strcasecmp (priv->runner, NM_SETTING_TEAM_RUNNER_ACTIVEBACKUP)
+	    && g_ascii_strcasecmp (priv->runner, NM_SETTING_TEAM_RUNNER_LOADBALANCE)
+	    && g_ascii_strcasecmp (priv->runner, NM_SETTING_TEAM_RUNNER_LACP)) {
+		g_set_error (error, NM_CONNECTION_ERROR, NM_CONNECTION_ERROR_INVALID_SETTING,
+		                     _("invalid runner \"%s\""), priv->runner);
+
+		g_prefix_error (error, "%s.%s: ", nm_setting_get_name (setting), NM_SETTING_TEAM_RUNNER);
+		return FALSE;
 	}
 
 	/* NOTE: normalizable/normalizable-errors must appear at the end with decreasing severity.
@@ -150,6 +373,10 @@ finalize (GObject *object)
 	NMSettingTeamPrivate *priv = NM_SETTING_TEAM_GET_PRIVATE (object);
 
 	g_free (priv->config);
+	g_free (priv->runner);
+	g_free (priv->runner_hwpolicy);
+	g_free (priv->runner_txbalancer);
+	g_free (priv->runner_aggselectpolicy);
 
 	G_OBJECT_CLASS (nm_setting_team_parent_class)->finalize (object);
 }
@@ -165,6 +392,36 @@ set_property (GObject *object, guint prop_id,
 		g_free (priv->config);
 		priv->config = g_value_dup_string (value);
 		break;
+	case PROP_NOTIFYPEERS_COUNT:
+		break;
+	case PROP_NOTIFYPEERS_INTERVAL:
+		break;
+	case PROP_MCASTREJOIN_COUNT:
+		break;
+	case PROP_MCASTREJOIN_INTERVAL:
+		break;
+	case PROP_RUNNER:
+		g_free (priv->runner);
+		priv->runner = g_value_dup_string (value);
+		break;
+	case PROP_RUNNER_HWPOLICY:
+		break;
+	case PROP_RUNNER_TXHASH:
+		break;
+	case PROP_RUNNER_TXBALANCER:
+		break;
+	case PROP_RUNNER_TXBALANCER_INTERVAL:
+		break;
+	case PROP_RUNNER_ACTIVE:
+		break;
+	case PROP_RUNNER_FASTRATE:
+		break;
+	case PROP_RUNNER_SYSPRIO:
+		break;
+	case PROP_RUNNER_MINPORTS:
+		break;
+	case PROP_RUNNER_AGGSELECTPOLICY:
+		break;
 	default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
 		break;
@@ -176,10 +433,53 @@ get_property (GObject *object, guint prop_id,
               GValue *value, GParamSpec *pspec)
 {
 	NMSettingTeam *setting = NM_SETTING_TEAM (object);
+	NMSettingTeamPrivate *priv = NM_SETTING_TEAM_GET_PRIVATE (setting);
 
 	switch (prop_id) {
 	case PROP_CONFIG:
 		g_value_set_string (value, nm_setting_team_get_config (setting));
+		break;
+	case PROP_NOTIFYPEERS_COUNT:
+		g_value_set_int (value, priv->notifypeers_count);
+		break;
+	case PROP_NOTIFYPEERS_INTERVAL:
+		g_value_set_int (value, priv->notifypeers_interval);
+		break;
+	case PROP_MCASTREJOIN_COUNT:
+		g_value_set_int (value, priv->mcastrejoin_count);
+		break;
+	case PROP_MCASTREJOIN_INTERVAL:
+		g_value_set_int (value, priv->mcastrejoin_interval);
+		break;
+	case PROP_RUNNER:
+		g_value_set_string (value, nm_setting_team_get_runner (setting));
+		break;
+	case PROP_RUNNER_HWPOLICY:
+		g_value_set_string (value, nm_setting_team_get_runner_hwpolicy (setting));
+		break;
+	case PROP_RUNNER_TXHASH:
+		g_value_take_boxed (value, _nm_utils_copy_strdict (priv->runner_txhash));
+		break;
+	case PROP_RUNNER_TXBALANCER:
+		g_value_set_string (value, nm_setting_team_get_runner_txbalancer (setting));
+		break;
+	case PROP_RUNNER_TXBALANCER_INTERVAL:
+		g_value_set_int (value, priv->runner_txbalancer_interval);
+		break;
+	case PROP_RUNNER_ACTIVE:
+		g_value_set_boolean (value, nm_setting_team_get_runner_active (setting));
+		break;
+	case PROP_RUNNER_FASTRATE:
+		g_value_set_boolean (value, nm_setting_team_get_runner_fastrate (setting));
+		break;
+	case PROP_RUNNER_SYSPRIO:
+		g_value_set_int (value, priv->runner_sysprio);
+		break;
+	case PROP_RUNNER_MINPORTS:
+		g_value_set_int (value, priv->runner_minports);
+		break;
+	case PROP_RUNNER_AGGSELECTPOLICY:
+		g_value_set_string (value, nm_setting_team_get_runner_aggselectpolicy (setting));
 		break;
 	default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -223,6 +523,224 @@ nm_setting_team_class_init (NMSettingTeamClass *setting_class)
 		                      NULL,
 		                      G_PARAM_READWRITE |
 		                      NM_SETTING_PARAM_INFERRABLE |
+		                      G_PARAM_STATIC_STRINGS));
+
+	/**
+	 * NMSettingTeam:notifypeers-count:
+	 *
+	 * Corresponds to the teamd notify_peers.count.
+	 *
+	 * Since: 1.10
+	 **/
+	g_object_class_install_property
+		(object_class, PROP_NOTIFYPEERS_COUNT,
+		 g_param_spec_int (NM_SETTING_TEAM_NOTIFYPEERS_COUNT, "", "",
+		                   G_MININT32, G_MAXINT32, 0,
+		                   G_PARAM_READWRITE |
+		                   G_PARAM_CONSTRUCT |
+		                   G_PARAM_STATIC_STRINGS));
+
+	/**
+	 * NMSettingTeam:notifypeers-interval:
+	 *
+	 * Corresponds to the teamd notify_peers.interval.
+	 *
+	 * Since: 1.10
+	 **/
+	g_object_class_install_property
+		(object_class, PROP_NOTIFYPEERS_INTERVAL,
+		 g_param_spec_int (NM_SETTING_TEAM_NOTIFYPEERS_INTERVAL, "", "",
+		                   G_MININT32, G_MAXINT32, 0,
+		                   G_PARAM_READWRITE |
+		                   G_PARAM_CONSTRUCT |
+		                   G_PARAM_STATIC_STRINGS));
+
+	/**
+	 * NMSettingTeam:mcastrejoin-count:
+	 *
+	 * Corresponds to the teamd mcast_rejoin.count.
+	 *
+	 * Since: 1.10
+	 **/
+	g_object_class_install_property
+		(object_class, PROP_MCASTREJOIN_COUNT,
+		 g_param_spec_int (NM_SETTING_TEAM_MCASTREJOIN_COUNT, "", "",
+		                   G_MININT32, G_MAXINT32, 0,
+		                   G_PARAM_READWRITE |
+		                   G_PARAM_CONSTRUCT |
+		                   G_PARAM_STATIC_STRINGS));
+
+	/**
+	 * NMSettingTeam:mcastrejoin-interval:
+	 *
+	 * Corresponds to the teamd mcast_rejoin.interval.
+	 *
+	 * Since: 1.10
+	 **/
+	g_object_class_install_property
+		(object_class, PROP_MCASTREJOIN_INTERVAL,
+		 g_param_spec_int (NM_SETTING_TEAM_MCASTREJOIN_INTERVAL, "", "",
+		                   G_MININT32, G_MAXINT32, 0,
+		                   G_PARAM_READWRITE |
+		                   G_PARAM_CONSTRUCT |
+		                   G_PARAM_STATIC_STRINGS));
+
+	/**
+	 * NMSettingTeam:runner:
+	 *
+	 * Corresponds to the teamd runner.name.
+	 * Permitted values are: "roundrobin", "broadcast", "activebackup",
+	 * "loadbalance", "lacp".
+	 *
+	 * Since: 1.10
+	 **/
+	g_object_class_install_property
+		(object_class, PROP_RUNNER,
+		 g_param_spec_string (NM_SETTING_TEAM_RUNNER, "", "",
+		                      "roundrobin",
+		                      G_PARAM_READWRITE |
+		                      G_PARAM_CONSTRUCT |
+		                      G_PARAM_STATIC_STRINGS));
+
+	/**
+	 * NMSettingTeam:runner-hwpolicy:
+	 *
+	 * Corresponds to the teamd runner.hwaddr_policy.
+	 *
+	 * Since: 1.10
+	 **/
+	g_object_class_install_property
+		(object_class, PROP_RUNNER_HWPOLICY,
+		 g_param_spec_string (NM_SETTING_TEAM_RUNNER_HWPOLICY, "", "",
+		                      NULL,
+		                      G_PARAM_READWRITE |
+		                      G_PARAM_CONSTRUCT |
+		                      G_PARAM_STATIC_STRINGS));
+
+	/**
+	 * NMSettingTeam:runner-txhash:
+	 *
+	 * Corresponds to the teamd runner.tx_hash.
+	 *
+	 * Since: 1.10
+	 *
+	 * Type: GHashTable(utf8,utf8)
+	 **/
+	g_object_class_install_property
+		(object_class, PROP_RUNNER_TXHASH,
+		 g_param_spec_boxed (NM_SETTING_TEAM_RUNNER_TXHASH, "", "",
+		                     G_TYPE_HASH_TABLE,
+	                             G_PARAM_READWRITE |
+		                     NM_SETTING_PARAM_INFERRABLE |
+	                             G_PARAM_STATIC_STRINGS));
+	_nm_setting_class_transform_property (parent_class, NM_SETTING_TEAM_RUNNER_TXHASH,
+	                                      G_VARIANT_TYPE ("a{ss}"),
+	                                      _nm_utils_strdict_to_dbus,
+	                                      _nm_utils_strdict_from_dbus);
+
+	/**
+	 * NMSettingTeam:runner-txbalancer:
+	 *
+	 * Corresponds to the teamd runner.tx_balancer.name.
+	 *
+	 * Since: 1.10
+	 **/
+	g_object_class_install_property
+		(object_class, PROP_RUNNER_TXBALANCER,
+		 g_param_spec_string (NM_SETTING_TEAM_RUNNER_TXBALANCER, "", "",
+		                      NULL,
+		                      G_PARAM_READWRITE |
+		                      G_PARAM_CONSTRUCT |
+		                      G_PARAM_STATIC_STRINGS));
+
+	/**
+	 * NMSettingTeam:runner-txbalancer-interval:
+	 *
+	 * Corresponds to the teamd runner.tx_balancer.interval.
+	 *
+	 * Since: 1.10
+	 **/
+	g_object_class_install_property
+		(object_class, PROP_RUNNER_TXBALANCER_INTERVAL,
+		 g_param_spec_int (NM_SETTING_TEAM_RUNNER_TXBALANCER_INTERVAL, "", "",
+		                   G_MININT32, G_MAXINT32, 0,
+		                   G_PARAM_READWRITE |
+		                   G_PARAM_CONSTRUCT |
+		                   G_PARAM_STATIC_STRINGS));
+
+	/**
+	 * NMSettingTeam:runner-active:
+	 *
+	 * Corresponds to the teamd runner.active.
+	 *
+	 * Since: 1.10
+	 **/
+	g_object_class_install_property
+		(object_class, PROP_RUNNER_ACTIVE,
+		 g_param_spec_boolean (NM_SETTING_TEAM_RUNNER_ACTIVE, "", "",
+		                       FALSE,
+		                       G_PARAM_READWRITE |
+		                       G_PARAM_CONSTRUCT |
+		                       G_PARAM_STATIC_STRINGS));
+
+	/**
+	 * NMSettingTeam:runner-fastrate:
+	 *
+	 * Corresponds to the teamd runner.fast_rate.
+	 *
+	 * Since: 1.10
+	 **/
+	g_object_class_install_property
+		(object_class, PROP_RUNNER_FASTRATE,
+		 g_param_spec_boolean (NM_SETTING_TEAM_RUNNER_FASTRATE, "", "",
+		                       FALSE,
+		                       G_PARAM_READWRITE |
+		                       G_PARAM_CONSTRUCT |
+		                       G_PARAM_STATIC_STRINGS));
+
+	/**
+	 * NMSettingTeam:runner-sysprio:
+	 *
+	 * Corresponds to the teamd runner.sys_prio.
+	 *
+	 * Since: 1.10
+	 **/
+	g_object_class_install_property
+		(object_class, PROP_RUNNER_SYSPRIO,
+		 g_param_spec_int (NM_SETTING_TEAM_RUNNER_SYSPRIO, "", "",
+		                   G_MININT32, G_MAXINT32, 0,
+		                   G_PARAM_READWRITE |
+		                   G_PARAM_CONSTRUCT |
+		                   G_PARAM_STATIC_STRINGS));
+
+	/**
+	 * NMSettingTeam:runner-minports:
+	 *
+	 * Corresponds to the teamd runner.min_ports.
+	 *
+	 * Since: 1.10
+	 **/
+	g_object_class_install_property
+		(object_class, PROP_RUNNER_MINPORTS,
+		 g_param_spec_int (NM_SETTING_TEAM_RUNNER_MINPORTS, "", "",
+		                   G_MININT32, G_MAXINT32, 0,
+		                   G_PARAM_READWRITE |
+		                   G_PARAM_CONSTRUCT |
+		                   G_PARAM_STATIC_STRINGS));
+
+	/**
+	 * NMSettingTeam:runner-aggselectpolicy:
+	 *
+	 * Corresponds to the teamd runner.agg_select_policy.
+	 *
+	 * Since: 1.10
+	 **/
+	g_object_class_install_property
+		(object_class, PROP_RUNNER_AGGSELECTPOLICY,
+		 g_param_spec_string (NM_SETTING_TEAM_RUNNER_AGGSELECTPOLICY, "", "",
+		                      NULL,
+		                      G_PARAM_READWRITE |
+		                      G_PARAM_CONSTRUCT |
 		                      G_PARAM_STATIC_STRINGS));
 
 	/* ---dbus---

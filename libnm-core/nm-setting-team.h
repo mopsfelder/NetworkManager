@@ -38,7 +38,27 @@ G_BEGIN_DECLS
 
 #define NM_SETTING_TEAM_SETTING_NAME "team"
 
-#define NM_SETTING_TEAM_CONFIG "config"
+#define NM_SETTING_TEAM_CONFIG                     "config"
+#define NM_SETTING_TEAM_NOTIFYPEERS_COUNT          "notifypeers-count"
+#define NM_SETTING_TEAM_NOTIFYPEERS_INTERVAL       "notifypeers-interval"
+#define NM_SETTING_TEAM_MCASTREJOIN_COUNT          "mcastrejoin-count"
+#define NM_SETTING_TEAM_MCASTREJOIN_INTERVAL       "mcastrejoin-interval"
+#define NM_SETTING_TEAM_RUNNER                     "runner"
+#define NM_SETTING_TEAM_RUNNER_HWPOLICY            "runner-hwpolicy"
+#define NM_SETTING_TEAM_RUNNER_TXHASH              "runner-txhash"
+#define NM_SETTING_TEAM_RUNNER_TXBALANCER          "runner-txbalancer"
+#define NM_SETTING_TEAM_RUNNER_TXBALANCER_INTERVAL "runner-txbalancer-interval"
+#define NM_SETTING_TEAM_RUNNER_ACTIVE              "runner-active"
+#define NM_SETTING_TEAM_RUNNER_FASTRATE            "runner-fastrate"
+#define NM_SETTING_TEAM_RUNNER_SYSPRIO             "runner-sysprio"
+#define NM_SETTING_TEAM_RUNNER_MINPORTS            "runner-minports"
+#define NM_SETTING_TEAM_RUNNER_AGGSELECTPOLICY     "runner-aggselectpolicy"
+
+#define NM_SETTING_TEAM_RUNNER_BROADCAST    "broadcast"
+#define NM_SETTING_TEAM_RUNNER_ROUNDROBIN   "roundrobin"
+#define NM_SETTING_TEAM_RUNNER_ACTIVEBACKUP "activebackup"
+#define NM_SETTING_TEAM_RUNNER_LOADBALANCE  "loadbalance"
+#define NM_SETTING_TEAM_RUNNER_LACP         "lacp"
 
 /**
  * NMSettingTeam:
@@ -61,6 +81,32 @@ GType nm_setting_team_get_type (void);
 NMSetting *  nm_setting_team_new                (void);
 
 const char * nm_setting_team_get_config (NMSettingTeam *setting);
+NM_AVAILABLE_IN_1_10
+gint nm_setting_team_get_notifypeers_count (NMSettingTeam *setting);
+NM_AVAILABLE_IN_1_10
+gint nm_setting_team_get_notifypeers_interval (NMSettingTeam *setting);
+NM_AVAILABLE_IN_1_10
+gint nm_setting_team_get_mcastrejoin_count (NMSettingTeam *setting);
+NM_AVAILABLE_IN_1_10
+gint nm_setting_team_get_mcastrejoin_interval (NMSettingTeam *setting);
+NM_AVAILABLE_IN_1_10
+const char * nm_setting_team_get_runner (NMSettingTeam *setting);
+NM_AVAILABLE_IN_1_10
+const char * nm_setting_team_get_runner_hwpolicy (NMSettingTeam *setting);
+NM_AVAILABLE_IN_1_10
+const char * nm_setting_team_get_runner_txbalancer (NMSettingTeam *setting);
+NM_AVAILABLE_IN_1_10
+gint nm_setting_team_get_runner_txbalancer_interval (NMSettingTeam *setting);
+NM_AVAILABLE_IN_1_10
+gboolean nm_setting_team_get_runner_active (NMSettingTeam *setting);
+NM_AVAILABLE_IN_1_10
+gboolean nm_setting_team_get_runner_fastrate (NMSettingTeam *setting);
+NM_AVAILABLE_IN_1_10
+gint nm_setting_team_get_runner_sysprio (NMSettingTeam *setting);
+NM_AVAILABLE_IN_1_10
+gint nm_setting_team_get_runner_minports (NMSettingTeam *setting);
+NM_AVAILABLE_IN_1_10
+const char * nm_setting_team_get_runner_aggselectpolicy (NMSettingTeam *setting);
 
 G_END_DECLS
 

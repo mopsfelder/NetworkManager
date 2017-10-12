@@ -427,7 +427,11 @@ gboolean _nm_utils_inet6_is_token (const struct in6_addr *in6addr);
 
 /*****************************************************************************/
 
-gboolean    _nm_utils_team_config_equal (const char *conf1, const char *conf2, gboolean port);
+gboolean _nm_utils_team_config_equal (const char *conf1, const char *conf2, gboolean port);
+char *_nm_utils_team_config_get (const char *conf,
+                                 const char *key,
+                                 const char *subkey,
+                                 gboolean port_config);
 
 /*****************************************************************************/
 
