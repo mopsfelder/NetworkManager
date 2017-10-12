@@ -460,6 +460,7 @@ _get_text_hidden (NMMetaAccessorGetType get_type)
 	return NM_META_TEXT_HIDDEN;
 }
 
+
 /*****************************************************************************/
 
 G_GNUC_PRINTF (4, 5)
@@ -3641,6 +3642,21 @@ _validate_fcn_team_config (const char *value, char **out_to_free, GError **error
 	RETURN_STR_TO_FREE (json);
 }
 
+static const char *team_valid_runners[] = {
+	NM_SETTING_TEAM_RUNNER_BROADCAST,
+	NM_SETTING_TEAM_RUNNER_ROUNDROBIN,
+	NM_SETTING_TEAM_RUNNER_ACTIVEBACKUP,
+	NM_SETTING_TEAM_RUNNER_LOADBALANCE,
+	NM_SETTING_TEAM_RUNNER_LACP,
+	NULL
+};
+
+static gboolean
+_set_fcn_team_runner (ARGS_SET_FCN)
+{
+	return check_and_set_string (setting, property_info->property_name, value, team_valid_runners, error);
+}
+
 static gconstpointer
 _get_fcn_vlan_flags (ARGS_GET_FCN)
 {
@@ -5918,6 +5934,52 @@ static const NMMetaPropertyInfo *const property_infos_TEAM[] = {
 		.property_typ_data = DEFINE_PROPERTY_TYP_DATA_SUBTYPE (gobject_string,
 			.validate_fcn =             _validate_fcn_team_config,
 		),
+	),
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_TEAM_NOTIFYPEERS_COUNT,
+		.property_type =                &_pt_gobject_int,
+	),
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_TEAM_NOTIFYPEERS_INTERVAL,
+		.property_type =                &_pt_gobject_int,
+	),
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_TEAM_MCASTREJOIN_COUNT,
+		.property_type =                &_pt_gobject_int,
+	),
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_TEAM_MCASTREJOIN_INTERVAL,
+		.property_type =                &_pt_gobject_int,
+	),
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_TEAM_RUNNER,
+		.property_type = DEFINE_PROPERTY_TYPE (
+			.get_fcn =                  _get_fcn_gobject,
+			.set_fcn =                  _set_fcn_team_runner,
+		),
+		.property_typ_data = DEFINE_PROPERTY_TYP_DATA (
+			.values_static =            team_valid_runners,
+		),
+	),
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_TEAM_RUNNER_HWPOLICY,
+		.property_type =                &_pt_gobject_string,
+	),
+//	PROPERTY_INFO_WITH_DESC (NM_SETTING_TEAM_RUNNER_TXHASH,
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_TEAM_RUNNER_TXBALANCER,
+		.property_type =                &_pt_gobject_string,
+	),
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_TEAM_RUNNER_TXBALANCER_INTERVAL,
+		.property_type =                &_pt_gobject_int,
+	),
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_TEAM_RUNNER_ACTIVE,
+		.property_type =                & _pt_gobject_bool,
+	),
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_TEAM_RUNNER_FASTRATE,
+		.property_type =                & _pt_gobject_bool,
+	),
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_TEAM_RUNNER_SYSPRIO,
+		.property_type =                &_pt_gobject_int,
+	),
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_TEAM_RUNNER_MINPORTS,
+		.property_type =                &_pt_gobject_int,
+	),
+	PROPERTY_INFO_WITH_DESC (NM_SETTING_TEAM_RUNNER_AGGSELECTPOLICY,
+		.property_type =                &_pt_gobject_string,
 	),
 	NULL
 };
