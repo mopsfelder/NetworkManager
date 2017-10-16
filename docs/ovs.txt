@@ -1,0 +1,75 @@
+OpenVSwitch trivia:
+
+configuration model is stored in ovsdb
+ovs-vswitchd merely applies whichever configuration it finds
+
+ovsdb model is documented in ovs-vswitchd.conf.db(5) *Large!*
+
+OVSDB:
+
+"Bridges" table
+ * name column
+ * ports[] column
+ * [stp column]
+ * ...
+Each row is a bridge that has list of ports.
+Each bridge contains at least one port with one interface with type "internal" and the same name as the bridge.
+
+"Ports" table
+ * name column
+ * interfaces[] column
+ * [vlan_tag column]
+ * [bonding_mode column]
+ * ...
+Each row defines a port. Each port has at least one interface. A port with more than one interface acts as a bond. A port can be also vlan-tagged.
+
+"Interfaces" table
+ * name column
+ * type column ("internal" or null)
+Each row defines an interface within a bond. If type is "internal" a type "openvswitch" link is created in platform. Otherwise an existing platform link is enslaved.
+
+Use cases:
+
+1.) empty bridge ovsbr0
+
+ * Bridge: name "ovsbr0", ports ["ovsbr0"]
+   * Port: name "ovsbr0", interfaces ["ovsbr0"]
+     * Interface: name "ovsbr0", type "internal"
+
+2.) bridge ovsbr0 with stp disabled, eth0 and eth1 slaves where eth1 is in vlan 666
+
+ * Bridge: name "ovsbr0", ports ["ovsbr0", "eth0", "eth1"], stp false
+   * Port: name "ovsbr0", interfaces ["ovsbr0"]
+     * Interface: name "ovsbr0", type "internal"
+   * Port: name "eth0", interfaces ["eth0"]
+     * Interface: name "eth0", type null
+   * Port: name "eth1", interfaces ["eth1"], vlan_tag 666
+     * Interface: name "eth1", type null
+
+3.) bridge ovsbr0 with a single slave of a bonded eth0 + eth1 in an active-backup bond
+
+ * Bridge: name "ovsbr0", ports ["ovsbr0", "eth0", "eth1"]
+   * Port: name "ovsbr0", interfaces ["ovsbr0"]
+     * Interface: name "ovsbr0", type "internal"
+   * Port: name "ovsport0", interfaces ["eth0", "eth1"], bonding_mode "active-backup"
+     * Interface: name "eth0", type null
+     * Interface: name "eth1", type null
+
+Modelling the use cases with NetworkManager:
+
+1.) empty bridge ovsbr0
+
+$ nmcli c add con.type ovs-bridge con.interface ovsbr0
+
+2.) bridge ovsbr0 with stp disabled, eth0 and eth1 slaves where eth1 is in vlan 666
+
+$ nmcli c add con.type ovs-bridge con.interface ovsbr0 ovs-bridge.stp off
+$ nmcli c add con.type 802-3-ethernet con.interface eth0 con.master ovsbr0
+$ nmcli c add con.type 802-3-ethernet con.interface eth1 con.master ovsbr0 ovs-port.vlan 666
+
+3.) bridge ovsbr0 with a single slave of a bonded eth0 + eth1 in an active-backup bond
+
+$ nmcli c add con.type ovs-bridge con.interface ovsbr0 ovs-bridge.stp off
+$ nmcli c add con.type ovs-port con.interface ovsport0 con.master ovsbr0
+$ nmcli c add con.type 802-3-ethernet con.interface eth0 con.master ovsport0
+$ nmcli c add con.type 802-3-ethernet con.interface eth1 con.master ovsport0
