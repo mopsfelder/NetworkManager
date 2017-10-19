@@ -3195,6 +3195,13 @@ clients_cppflags = \
 check_ltlibraries += clients/common/libnmc-base.la
 
 clients_common_libnmc_base_la_SOURCES = \
+	clients/common/nm-secret-agent-simple.c \
+	clients/common/nm-secret-agent-simple.h \
+	clients/common/nm-vpn-helpers.c \
+	clients/common/nm-vpn-helpers.h \
+	clients/common/nm-client-utils.c \
+	clients/common/nm-client-utils.h \
+	\
 	shared/nm-utils/nm-enum-utils.c \
 	shared/nm-utils/nm-enum-utils.h \
 	shared/nm-utils/nm-hash-utils.c \
@@ -3204,14 +3211,7 @@ clients_common_libnmc_base_la_SOURCES = \
 	shared/nm-utils/nm-shared-utils.c \
 	shared/nm-utils/nm-shared-utils.h \
 	shared/nm-utils/siphash24.c \
-	shared/nm-utils/siphash24.h \
-	\
-	clients/common/nm-secret-agent-simple.c \
-	clients/common/nm-secret-agent-simple.h \
-	clients/common/nm-vpn-helpers.c \
-	clients/common/nm-vpn-helpers.h \
-	clients/common/nm-client-utils.c \
-	clients/common/nm-client-utils.h
+	shared/nm-utils/siphash24.h
 
 clients_common_libnmc_base_la_CPPFLAGS = \
 	$(clients_cppflags) \
