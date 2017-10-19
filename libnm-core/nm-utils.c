@@ -4419,6 +4419,203 @@ out:
 	return ret;
 }
 
+
+#define JSON_ADD_OBJ(json, key, key2, key3, value) \
+	G_STMT_START { \
+		json_t *_json_element; \
+		\
+		_json_element = json_object_get (json, key); \
+		if (!_json_element) { \
+			_json_element = json_object (); \
+			json_object_set_new (_json_element, key2, value); \
+			json_object_set_new (json, key, _json_element); \
+		} else { \
+			_json_element = json_object_get (_json_element, key2); \
+			if (!_json_element) { \
+				json_t *json_link = value; \
+				\
+				if (key3) { \
+					_json_element = json_object (); \
+					json_object_set_new (_json_element, key3, value); \
+					json_link = _json_element; \
+				} \
+				json_object_set_new (_json_element, key2, json_link); \
+			} else if (key3) { \
+				_json_element = json_object_get (_json_element, key3); \
+				if (!_json_element) \
+					json_object_set_new (_json_element, key3, value); \
+				else \
+					json_decref (value); \
+			} else \
+				json_decref (value); \
+		} \
+	} G_STMT_END
+
+GValue *
+_nm_utils_team_config_get (const char *conf,
+                           const char *key,
+                           const char *key2,
+                           const char *key3,
+                           gboolean port_config)
+{
+	json_t *json;
+	json_t *json_element;
+	GValue *value = NULL;
+	json_error_t jerror;
+	const char *runner = NULL;
+
+	if (!key)
+		return NULL;
+
+	json = json_loads (conf ?: "{}", JSON_REJECT_DUPLICATES, &jerror);
+
+	/* Some properties are added by teamd when missing from the initial
+	 * configuration.  Add them with the default value if necessary, depending
+	 * on the configuration type.
+	 */
+	if  (port_config) {
+		JSON_ADD_OBJ (json, "link_watch", "name", NULL, json_string ("ethtool"));
+	} else {
+		/* Retrieve runner or add default one */
+		json_element = json_object_get (json, "runner");
+		if (json_element) {
+			runner = json_string_value (json_object_get (json_element, "name"));
+		} else {
+			json_element = json_object ();
+			json_object_set_new (json, "runner", json_element);
+		}
+		if (!runner) {
+			runner = "roundrobin";
+			json_object_set_new (json_element, "name", json_string (runner));
+		}
+
+
+		if nm_streq (runner, "activebackup") {
+			JSON_ADD_OBJ (json, "notify_peers", "count", NULL, json_integer (1));
+			JSON_ADD_OBJ (json, "mcast_rejoin", "count", NULL, json_integer (1));
+			JSON_ADD_OBJ (json, "runner", "hwaddr_policy", NULL, json_string ("same_all"));
+		} else if (nm_streq (runner, "loadbalance") || nm_streq (runner, "lacp")) {
+			json_element = json_array ();
+			json_array_append_new (json_element, json_string ("eth"));
+			json_array_append_new (json_element, json_string ("ipv4"));
+			json_array_append_new (json_element, json_string ("ipv6"));
+			JSON_ADD_OBJ (json, "runner", "tx_hash", NULL, json_element);
+		}
+	}
+	json_element = json_object_get (json, key);
+	if (json_element && key2)
+		json_element = json_object_get (json_element, key2);
+	if (json_element && key3)
+		json_element = json_object_get (json_element, key3);
+
+	if (json_element) {
+		value = g_new0 (GValue, 1);
+		if (json_is_string (json_element)) {
+			g_value_init (value, G_TYPE_STRING);
+			g_value_set_string (value, json_string_value (json_element));
+		} else if (json_is_integer (json_element)) {
+			g_value_init (value, G_TYPE_INT);
+			g_value_set_int (value, json_integer_value (json_element));
+		} else if (json_is_boolean (json_element)) {
+			g_value_init (value, G_TYPE_BOOLEAN);
+			g_value_set_boolean (value, json_boolean_value (json_element));
+		} else {
+			g_assert_not_reached ();
+			g_free (value);
+			value = NULL;
+		}
+	}
+
+	if (json)
+		json_decref (json);
+
+	return value;
+}
+
+/* if conf is updated in place returns TRUE */
+gboolean
+_nm_utils_team_config_set (char **conf,
+                           const char *key,
+                           const char *key2,
+                           const char *key3,
+                           const GValue *value)
+{
+	json_t *json, *json_element, *json_link, *json_value = NULL;
+	json_error_t jerror;
+	gboolean updated = FALSE;
+
+	json = json_loads (*conf?: "{}", JSON_REJECT_DUPLICATES, &jerror);
+	if (!json)
+		return FALSE;
+
+	/* no new value? delete element */
+	if (!value) {
+		const char *remove_key = key2;
+
+		json_element = json_object_get (json, key);
+		if (!json_element)
+			goto done;
+		if (key3) {
+			json_element = json_object_get (json_element, key2);
+			if (!json_element)
+				goto done;
+			remove_key = key3;
+		}
+		if (json_object_del (json_element, remove_key) == 0)
+			updated = TRUE;
+		goto done;
+	}
+
+	/* insert new value */
+	updated = TRUE;
+	if (G_VALUE_HOLDS_STRING (value))
+		json_value = json_string (g_value_get_string (value));
+	else if (G_VALUE_HOLDS_INT (value))
+		json_value = json_integer (g_value_get_int (value));
+	else if (G_VALUE_HOLDS_BOOLEAN (value))
+		json_value = json_boolean (g_value_get_boolean (value));
+	else {
+		g_assert_not_reached ();
+		updated = FALSE;
+		goto done;
+	}
+
+	json_element = json_object_get (json, key);
+	if (!json_element) {
+		if (key3) {
+			json_link = json_object ();
+			json_object_set_new (json_link, key3, json_value);
+		} else
+			json_link = json_value;
+		json_element = json_object ();
+		json_object_set_new (json_element, key2, json_link);
+		json_object_set_new (json, key, json_element);
+		goto done;
+	}
+
+	if (key3) {
+		json_link = json_object_get (json_element, key2);
+		if (!json_link) {
+			json_link = json_object ();
+			json_object_set_new (json_element, key2, json_link);
+		}
+		json_element = json_link;
+
+		json_link = json_object ();
+		json_object_set_new (json_link, key3, json_value);
+	} else
+		json_link = json_value;
+	json_object_set_new (json_element, key2, json_link);
+
+done:
+	if (updated) {
+		g_free (*conf);
+		*conf = json_dumps (json, 0);
+	}
+	json_decref (json);
+	return updated;
+}
+
 #else /* WITH_JANSSON */
 
 gboolean
@@ -4472,6 +4669,26 @@ _nm_utils_team_config_equal (const char *conf1,
                              gboolean port_config)
 {
 	return nm_streq0 (conf1, conf2);
+}
+
+GValue *
+_nm_utils_team_config_get (const char *conf,
+                           const char *key,
+                           const char *key2,
+                           const char *key3,
+                           gboolean port_config)
+{
+	return NULL;
+}
+
+gboolean
+_nm_utils_team_config_set (char **conf,
+                           const char *key,
+                           const char *key2,
+                           const char *key3,
+                           const GValue *value)
+{
+	return FALSE;
 }
 #endif
 
