@@ -381,16 +381,63 @@ finalize (GObject *object)
 	G_OBJECT_CLASS (nm_setting_team_parent_class)->finalize (object);
 }
 
+
+#define JSON_EXTRACT_VAL(var, conf, key, key2, key3) \
+	G_STMT_START { \
+		gs_free GValue *t_value = NULL; \
+		\
+		t_value = _nm_utils_team_config_get (conf, key, key2, key3, FALSE); \
+		if (!t_value) \
+			var = 0; \
+		else if (G_VALUE_HOLDS_INT (t_value)) \
+			var = g_value_get_int (t_value); \
+		else if (G_VALUE_HOLDS_BOOLEAN (t_value)) \
+			var = g_value_get_boolean (t_value); \
+	} G_STMT_END
+#define JSON_EXTRACT_STRING(var, conf, key, key2, key3) \
+	G_STMT_START { \
+		gs_free GValue *t_value = NULL; \
+		\
+		g_free (var); \
+		t_value = _nm_utils_team_config_get (conf, key, key2, key3, FALSE); \
+		if (!t_value) \
+			var = NULL; \
+		else \
+			var = g_value_dup_string (t_value); \
+	} G_STMT_END
+
+static void
+_align_team_properties (NMSettingTeam *setting)
+{
+	NMSettingTeamPrivate *priv = NM_SETTING_TEAM_GET_PRIVATE (setting);
+
+	JSON_EXTRACT_VAL (priv->notifypeers_count, priv->config, "notify_peers", "count", NULL);
+	JSON_EXTRACT_VAL (priv->notifypeers_interval, priv->config, "notify_peers", "interval", NULL);
+	JSON_EXTRACT_VAL (priv->mcastrejoin_count, priv->config, "mcast_rejoin", "count", NULL);
+	JSON_EXTRACT_VAL (priv->mcastrejoin_interval, priv->config, "mcast_rejoin", "interval", NULL);
+	JSON_EXTRACT_STRING (priv->runner, priv->config, "runner", "name", NULL);
+	JSON_EXTRACT_STRING (priv->runner_hwpolicy, priv->config, "runner", "hwaddr_policy", NULL);
+	JSON_EXTRACT_STRING (priv->runner_txbalancer, priv->config, "runner", "tx_balancer", "name");
+	JSON_EXTRACT_VAL (priv->runner_txbalancer_interval, priv->config, "runner", "tx_balancer", "interval");
+	JSON_EXTRACT_VAL (priv->runner_active, priv->config, "runner", "active", NULL);
+	JSON_EXTRACT_VAL (priv->runner_fastrate, priv->config, "runner", "fastrate", NULL);
+	JSON_EXTRACT_VAL (priv->runner_sysprio, priv->config, "runner", "sys_prio", NULL);
+	JSON_EXTRACT_VAL (priv->runner_minports, priv->config, "runner", "min_ports", NULL);
+	JSON_EXTRACT_STRING (priv->runner_aggselectpolicy, priv->config, "runner", "agg_select_policy", NULL);
+}
+
 static void
 set_property (GObject *object, guint prop_id,
               const GValue *value, GParamSpec *pspec)
 {
+	NMSettingTeam *setting = NM_SETTING_TEAM (object);
 	NMSettingTeamPrivate *priv = NM_SETTING_TEAM_GET_PRIVATE (object);
 
 	switch (prop_id) {
 	case PROP_CONFIG:
 		g_free (priv->config);
 		priv->config = g_value_dup_string (value);
+		_align_team_properties (setting);
 		break;
 	case PROP_NOTIFYPEERS_COUNT:
 		break;
